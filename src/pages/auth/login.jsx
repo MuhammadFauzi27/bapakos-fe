@@ -39,9 +39,12 @@ export const Login = () => {
               className="w-full border p-2 rounded"
             />
 
-            <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+            <Link
+              to="/admin/dashboard"
+              className="block w-full text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+            >
               Login
-            </button>
+            </Link>
           </form>
 
           <p className="text-sm text-center mt-4 text-gray-600">

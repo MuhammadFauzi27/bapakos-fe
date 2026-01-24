@@ -1,13 +1,33 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {Login} from "../pages/auth/login.jsx";
 import {Register} from "../pages/auth/register.jsx";
+import {Sidebar} from "../pages/admin/sidebar.jsx";
+
+import { AdminLayout } from "../pages/admin/adminLayout.jsx";
+import { Dashboard } from "../pages/admin/dashboard.jsx";
+import { Transaksi } from "../pages/admin/transaksi.jsx";
+import { Order } from "../pages/admin/order.jsx";
+import { Report } from "../pages/admin/report.jsx";
+import { TambahKos } from "../pages/admin/kamar.jsx";
+
+
 
 export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* AUTH */}
         <Route path="/" element={<Login/>} />
         <Route path="/register" element={<Register/>} />
+        {/* ADMIN */}
+        <Route path="/admin" element={<AdminLayout/>}>
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard/>} />
+          <Route path="kamar" element={<TambahKos/>} />
+          <Route path="transaksi" element={<Transaksi/>} />
+          <Route path="order" element={<Order/>} />
+          <Route path="report" element={<Report/>} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )

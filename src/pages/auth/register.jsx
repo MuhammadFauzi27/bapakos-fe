@@ -47,9 +47,12 @@ export const Register = () => {
               className="w-full border p-2 rounded"
             />
 
-            <button className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+            <Link
+              to="/"
+              className="block w-full text-center bg-green-500 text-white py-2 rounded hover:bg-green-600"
+            >
               Daftar
-            </button>
+            </Link>
           </form>
 
           <p className="text-sm text-center mt-4 text-gray-600">
