@@ -12,6 +12,7 @@ export const TambahKos = () => {
           </label>
           <input
             type="text"
+            name="namaKost"
             placeholder="Contoh: Kos Melati Indah"
             className="w-full border rounded-lg px-4 py-2 text-sm"
           />
@@ -26,6 +27,7 @@ export const TambahKos = () => {
             </label>
             <input
               type="number"
+              name="jumlahKamar"
               placeholder="Contoh: 10"
               className="w-full border rounded-lg px-4 py-2 text-sm"
             />
@@ -37,6 +39,7 @@ export const TambahKos = () => {
             </label>
             <input
               type="number"
+              name="hargaKamar"
               placeholder="Contoh: 850000"
               className="w-full border rounded-lg px-4 py-2 text-sm"
             />
@@ -51,6 +54,7 @@ export const TambahKos = () => {
           </label>
           <textarea
             rows="3"
+            name="deskripsiKost"
             placeholder="Berikan deskripsi singkat mengenai properti Anda..."
             className="w-full border rounded-lg px-4 py-2 text-sm resize-none"
           />
@@ -77,7 +81,7 @@ export const TambahKos = () => {
                 <label className="text-sm font-medium block mb-1">
                   Provinsi
                 </label>
-                <select className="w-full border rounded-lg px-4 py-2 text-sm">
+                <select className="w-full border rounded-lg px-4 py-2 text-sm" name="provinsi">
                   <option>Pilih Provinsi</option>
                   <option>Jakarta</option>
                   <option>Jawa Barat</option>
@@ -91,7 +95,7 @@ export const TambahKos = () => {
                 <label className="text-sm font-medium block mb-1">
                   Kota / Kabupaten
                 </label>
-                <select className="w-full border rounded-lg px-4 py-2 text-sm">
+                <select className="w-full border rounded-lg px-4 py-2 text-sm" name="kota">
                   <option>Pilih Kota/Kabupaten</option>
                   <option>Kota Bandung</option>
                   <option>Kota Jakarta</option>
@@ -110,6 +114,7 @@ export const TambahKos = () => {
               </label>
               <input
                 type="text"
+                name="kodePos"
                 placeholder="Contoh: 17111"
                 className="w-full border rounded-lg px-4 py-2 text-sm"
               />
@@ -122,6 +127,7 @@ export const TambahKos = () => {
               </label>
               <textarea
                 rows="3"
+                name="alamatKost"
                 placeholder="Nama jalan, nomor rumah, kecamatan, desa/kelurahan, RT/RW..."
                 className="w-full border rounded-lg px-4 py-2 text-sm resize-none"
               />
@@ -135,7 +141,7 @@ export const TambahKos = () => {
               Gambar Properti
             </label>
 
-            <div className="border-2 border-dashed rounded-xl h-[220px] flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-blue-400 transition">
+            <div className="border-2 border-dashed rounded-xl h-[220px] flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-blue-400 transition" name="gambarKost">
               <span className="text-3xl mb-1">＋</span>
               <p className="text-sm">Klik untuk memilih gambar...</p>
             </div>
@@ -151,22 +157,22 @@ export const TambahKos = () => {
 
           <div className="flex flex-wrap gap-6 text-sm">
 
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2" name="fasilitas">
               <input type="checkbox" />
               AC
             </label>
 
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2" name="fasilitas">
               <input type="checkbox" />
               Kamar Mandi Dalam
             </label>
 
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2" name="fasilitas">
               <input type="checkbox" />
               Kamar Mandi Luar
             </label>
 
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2" name="fasilitas">
               <input type="checkbox" />
               Wifi
             </label>

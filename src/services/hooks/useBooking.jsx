@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {apiJson} from "../apiJson.js";
 
-export const useCreateKost = () => {
+export const useBookingKost = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -11,18 +11,20 @@ export const useCreateKost = () => {
   const token = localStorage.getItem("token")
   headers.Authorization = `Bearer ${token}`
 
-  const submitCreate = async (payload) => {
+  const submitBooking = async (payload) => {
     setLoading(true)
     setError(null)
 
     try {
-      return await apiJson("/landlord/dashboard/kost", headers,"POST", {
-        name: payload.namaKost,
-        price: payload.hargaKamar,
+      return await apiJson("/tenant/booking", headers,"POST", {
+        id: payload.id,
+        landlordId: payload.id,
+        name: payload.title,
+        price: payload.price,
         description: payload.deskripsiKost,
-        location: payload.provinsi.kota.kodePos.alamatKos,
+        location: payload.address,
         facilities: payload.fasilitas,
-        totalRooms: payload.jumlahKamar,
+        images: payload.gambarKost,
       })
     } catch (err) {
       setError(err.message)
