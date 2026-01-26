@@ -177,3 +177,39 @@ export const useLandlordPatchKostById = () => {
     error,
   };
 };
+
+export const useLandlordDeleteKostById = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  const token = localStorage.getItem("token");
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const deleteKostById = async (payload) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      return await apiJson(
+        `/landlord/dashboard/kost/${payload.id}`,
+        "DELETE",
+        undefined,
+        headers
+      );
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    deleteKostById,
+    loading,
+    error,
+  };
+};
