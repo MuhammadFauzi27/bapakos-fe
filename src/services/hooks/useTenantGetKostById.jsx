@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {apiJson} from "../apiJson.js";
 
-export const getKostLandloard = () => {
+export const useTenantGetKostById = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -11,12 +11,12 @@ export const getKostLandloard = () => {
   const token = localStorage.getItem("token")
   headers.Authorization = `Bearer ${token}`
 
-  const getKostLandloard = async (payload) => {
+  const getKostById = async (payload) => {
     setLoading(true)
     setError(null)
 
     try {
-      return await apiJson("/landlord/dashboard/kost", headers, "GET")
+      return await apiJson(`/tenant/kost/${payload.kostId}`, headers, "GET")
     } catch (err) {
       setError(err.message)
       throw err
@@ -26,7 +26,7 @@ export const getKostLandloard = () => {
   }
 
   return {
-    submitRegister,
+    getKostById,
     loading,
     error,
   }

@@ -1,10 +1,10 @@
 // src/pages/user/userLayout.jsx
 import { useState } from "react";
-import Navbar from "./navbar";
-import FilterSidebar from "./userSidebar";
-import ListingCard from "./kosCard";
-import DetailKosModal from "./detailKosModal";
-import { KOS_LIST } from "./kosData";
+import Navbar from "../pages/user/navbar.jsx";
+import FilterSidebar from "./userSidebar.jsx";
+import ListingCard from "./kosCard.jsx";
+import DetailKosModal from "../pages/user/detailKosModal.jsx";
+import { KOS_LIST } from "../pages/user/kosData.js";
 
 export default function UserLayout() {
   const [selected, setSelected] = useState(null);

@@ -1,8 +1,13 @@
-import { useState } from 'react';
-import {useCreateKost, useUploadKostImages} from "../../services/hooks/useLandlord.jsx";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useGetKostById, useLandlordPatchKostById, useUploadKostImages } from "../../services/hooks/useLandlord.jsx";
 
-export const TambahKos = () => {
-  const { submitCreate, loading: createLoading, error: createError } = useCreateKost();
+export const UpdateKos = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const { getKostById, loading: fetchLoading, error: fetchError } = useGetKostById();
+  const { patchKostById, loading: updateLoading, error: updateError } = useLandlordPatchKostById();
   const { uploadImages, loading: uploadLoading, error: uploadError } = useUploadKostImages();
 
   const [formData, setFormData] = useState({
@@ -19,6 +24,64 @@ export const TambahKos = () => {
 
   const [imageFile, setImageFile] = useState(null);
   const [previewImages, setPreviewImages] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const splitAndKeepRest = (str, separator, limit) => {
+    if (!str) return [];
+
+    const parts = str.split(separator);
+
+    if (parts.length <= limit) {
+      return parts;
+    }
+
+    const result = parts.slice(0, limit - 1);
+    const rest = parts.slice(limit - 1).join(separator);
+
+    result.push(rest);
+    return result;
+  };
+  // Fetch data kost saat komponen dimount
+  useEffect(() => {
+    const fetchKostData = async () => {
+      try {
+        const result = await getKostById({ id });
+        console.log(result);
+        if (result?.data) {
+          const data = result.data;
+          const location = splitAndKeepRest(data.location, '.', 4);
+
+          console.log(data.totalRooms)
+
+          setFormData({
+            name: data.name || '',
+            totalRooms: data.totalRooms || '',
+            price: data.price || '',
+            description: data.description || '',
+            provinsi: location[0] || '',
+            kota: location[1] || '',
+            kodePos: location[2] || '',
+            alamatKos: location[3] || '',
+            facilities: data.facilities || []
+          });
+
+          // Set existing images jika ada
+          if (data.images && data.images.length > 0) {
+            setExistingImages(data.images);
+          }
+
+          setDataLoaded(true);
+        }
+      } catch (error) {
+        console.error('Error fetching kost:', error);
+        alert('Gagal memuat data kos');
+      }
+    };
+
+    if (id) {
+      fetchKostData();
+    }
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -54,79 +117,76 @@ export const TambahKos = () => {
         return;
       }
 
-      // Step 1: Create Kost
-      const createResult = await submitCreate({
-        name: formData.name,
-        price: parseInt(formData.price),
-        totalRooms: parseInt(formData.totalRooms),
-        description: formData.description,
-        provinsi: formData.provinsi,
-        kota: formData.kota,
-        kodePos: formData.kodePos,
-        alamatKos: formData.alamatKos,
-        facilities: formData.facilities
+      // Gabungkan lokasi
+      const lokasi = [formData?.provinsi, formData?.kota, formData?.kodePos, formData?.alamatKos]
+        .filter(Boolean)
+        .join(".");
+
+      const patchData = {};
+      if ('name' in formData) patchData.name = formData.name;
+      if ('price' in formData) patchData.price = parseInt(formData.price);
+      if ('totalRooms' in formData) patchData.total_rooms = parseInt(formData.totalRooms);
+      if ('description' in formData) patchData.description = formData.description;
+      if ('provinsi' in formData || 'kota' in formData || 'kodePos' in formData || 'alamatKos' in formData) {
+        patchData.location = lokasi;
+      }
+      if ('facilities' in formData) patchData.facilities = formData.facilities;
+
+      // Step 1: Update Kost
+      await patchKostById({
+        id,
+        data: patchData
       });
 
-      if (imageFile && createResult?.data.id) {
-        console.log("image ada!: ", imageFile);
-        await uploadImages(createResult.data.id, imageFile);
+      // Step 2: Upload gambar baru jika ada
+      if (imageFile) {
+        console.log("Uploading new image: ", imageFile);
+        await uploadImages(id, imageFile);
       }
 
-      alert('Kos berhasil ditambahkan!');
-
-      // Reset form
-      setFormData({
-        name: '',
-        totalRooms: '',
-        price: '',
-        description: '',
-        provinsi: '',
-        kota: '',
-        kodePos: '',
-        alamatKos: '',
-        facilities: []
-      });
-      setImageFile(null);
-      setPreviewImages([]);
+      alert('Kos berhasil diperbarui!');
+      navigate('/admin/dashboard'); // Redirect ke halaman dashboard atau list
 
     } catch (error) {
       console.error('Error:', error);
-      alert('Gagal menambahkan kos: ' + error.message);
+      alert('Gagal memperbarui kos: ' + error.message);
     }
   };
 
   const handleCancel = () => {
-    if (confirm('Apakah Anda yakin ingin membatalkan? Data yang diisi akan hilang.')) {
-      setFormData({
-        name: '',
-        totalRooms: '',
-        price: '',
-        description: '',
-        provinsi: '',
-        kota: '',
-        kodePos: '',
-        alamatKos: '',
-        facilities: []
-      });
-      setImageFile(null);
-      setPreviewImages([]);
+    if (confirm('Apakah Anda yakin ingin membatalkan? Perubahan yang belum disimpan akan hilang.')) {
+      navigate(-1); // Kembali ke halaman sebelumnya
     }
   };
 
-  const isLoading = createLoading || uploadLoading;
+  const isLoading = fetchLoading || updateLoading || uploadLoading;
+
+  // Loading state saat fetch data
+  if (fetchLoading && !dataLoaded) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-gray-600">Memuat data kos...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4">
 
       {/* Error Messages */}
-      {(createError || uploadError) && (
+      {(fetchError || updateError || uploadError) && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          {createError || uploadError}
+          {fetchError || updateError || uploadError}
         </div>
       )}
 
       {/* ================= CARD ATAS ================= */}
       <div className="bg-white rounded-xl p-6 border space-y-4">
+
+        <h2 className="text-lg font-semibold mb-4">Edit Data Kos</h2>
 
         {/* Nama Kos */}
         <div>
@@ -286,6 +346,23 @@ export const TambahKos = () => {
               Gambar Properti
             </label>
 
+            {/* Existing Images */}
+            {existingImages.length > 0 && previewImages.length === 0 && (
+              <div className="mb-4">
+                <p className="text-xs text-gray-500 mb-2">Gambar saat ini:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {existingImages.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img.url || img}
+                      alt={`Existing ${idx + 1}`}
+                      className="w-full h-20 object-cover rounded border"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             <input
               type="file"
               id="fileInput"
@@ -311,13 +388,13 @@ export const TambahKos = () => {
                     ))}
                   </div>
                   <p className="text-xs text-center mt-2">
-                    {imageFile.length} gambar dipilih
+                    Gambar baru dipilih
                   </p>
                 </div>
               ) : (
                 <>
                   <span className="text-3xl mb-1">＋</span>
-                  <p className="text-sm">Klik untuk memilih gambar...</p>
+                  <p className="text-sm">Klik untuk memilih gambar baru...</p>
                 </>
               )}
             </label>
@@ -393,10 +470,10 @@ export const TambahKos = () => {
             {isLoading ? (
               <>
                 <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                Menyimpan...
+                Memperbarui...
               </>
             ) : (
-              'Simpan'
+              'Perbarui'
             )}
           </button>
         </div>
