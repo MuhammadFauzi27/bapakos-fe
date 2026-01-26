@@ -1,6 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetKostById, useLandlordPatchKostById, useUploadKostImages } from "../../services/hooks/useLandlord.jsx";
+import {baseUrlImg} from "../../services/apiJson.js";
+
+export const splitAndKeepRest = (str, separator, limit) => {
+  if (!str) return [];
+
+  const parts = str.split(separator);
+
+  if (parts.length <= limit) {
+    return parts;
+  }
+
+  const result = parts.slice(0, limit - 1);
+  const rest = parts.slice(limit - 1).join(separator);
+
+  result.push(rest);
+  return result;
+};
 
 export const UpdateKos = () => {
   const { id } = useParams();
@@ -26,27 +43,12 @@ export const UpdateKos = () => {
   const [previewImages, setPreviewImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
-  const splitAndKeepRest = (str, separator, limit) => {
-    if (!str) return [];
 
-    const parts = str.split(separator);
-
-    if (parts.length <= limit) {
-      return parts;
-    }
-
-    const result = parts.slice(0, limit - 1);
-    const rest = parts.slice(limit - 1).join(separator);
-
-    result.push(rest);
-    return result;
-  };
   // Fetch data kost saat komponen dimount
   useEffect(() => {
     const fetchKostData = async () => {
       try {
         const result = await getKostById({ id });
-        console.log(result);
         if (result?.data) {
           const data = result.data;
           const location = splitAndKeepRest(data.location, '.', 4);
@@ -352,11 +354,17 @@ export const UpdateKos = () => {
                 <p className="text-xs text-gray-500 mb-2">Gambar saat ini:</p>
                 <div className="grid grid-cols-2 gap-2">
                   {existingImages.map((img, idx) => (
+                    console.log(`${baseUrlImg}/${img.image_url}`),
                     <img
                       key={idx}
-                      src={img.url || img}
+                      src={`${baseUrlImg}/${img.image_url}`}
                       alt={`Existing ${idx + 1}`}
                       className="w-full h-20 object-cover rounded border"
+                      onError={(e) => {
+                        console.log("--- ERROR LOAD GAMBAR ---");
+                        console.log("URL yang dicoba:", `${baseUrlImg}/${img.image_url}`);
+                      }}
+                      onLoad={() => console.log("Berhasil load:", `${baseUrlImg}/${img.image_url}`)}
                     />
                   ))}
                 </div>

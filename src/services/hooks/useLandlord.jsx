@@ -95,7 +95,7 @@ export const useLandlordGetKostsById = () => {
     setError(null)
 
     try {
-      return await apiJson("/landlord/dashboard/kost", "GET", null, headers)
+      return await apiJson("/landlord/dashboard/kost", "GET", undefined, headers)
     } catch (err) {
       setError(err.message)
       throw err
@@ -126,7 +126,7 @@ export const useGetKostById = () => {
     setError(null)
 
     try {
-      return await apiJson(`/landlord/dashboard/kost/${payload.id}`, "GET", null, headers)
+      return await apiJson(`/landlord/dashboard/kost/${payload.id}`, "GET", undefined, headers)
     } catch (err) {
       setError(err.message)
       throw err

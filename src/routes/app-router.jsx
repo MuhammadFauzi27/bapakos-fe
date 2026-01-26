@@ -10,7 +10,7 @@ import { Report } from "../pages/admin/report.jsx";
 import { TambahKos } from "../pages/admin/kamar.jsx";
 import { UpdateKos } from "../pages/admin/editKamar.jsx";
 
-import UserLayout from "../components/userLayout.jsx";
+import UserLayout from "../pages/user/userLayout.jsx";
 
 export const AppRouter = () => {
   return (
