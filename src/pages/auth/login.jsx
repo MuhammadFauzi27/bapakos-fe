@@ -1,6 +1,40 @@
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {useLogin} from "../../services/hooks/useAuth.jsx";
+import {useState} from "react";
 
 export const Login = () => {
+  const navigate = useNavigate();
+  const {submitLogin, loading, error} = useLogin();
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  })
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    try {
+      const result = await submitLogin(form)
+
+      localStorage.setItem("token", result.data.token)
+
+      if (result.data.role === "LANDLORD") {
+        navigate("/admin/dashboard")
+      } else if (result.data.role === "TENANT") {
+        navigate("/user")
+      }
+
+    } catch (err) {
+    }
+  }
+
   return (
     <div className="flex min-h-screen">
       {/* Panel kiri - Gambar */}
@@ -20,31 +54,46 @@ export const Login = () => {
             <p className="text-slate-600 mt-2">Masuk ke akun BapaKos Anda</p>
           </div>
 
-          <form className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Username</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Email
+              </label>
               <input
-                type="text"
-                placeholder="Masukkan username"
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Masukkan email"
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Password
+              </label>
               <input
                 type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
                 placeholder="Masukkan password"
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
             </div>
 
-            <Link
-              to="/admin/dashboard"
-              className="block w-full text-center bg-sky-600 text-white py-3 rounded-lg font-medium hover:bg-sky-700 transition"
+            {error && (
+              <p className="text-red-500 text-sm">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-sky-600 text-white py-3 rounded-lg font-medium hover:bg-sky-700 transition disabled:opacity-50"
             >
-              Login
-            </Link>
+              {loading ? "Loading..." : "Login"}
+            </button>
           </form>
 
           <p className="text-center text-sm text-slate-600 mt-6">
